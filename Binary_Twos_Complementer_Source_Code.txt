@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binary Two's Complementer | Mealy Machine</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;font-family:Arial,Helvetica,sans-serif;
+ background:linear-gradient(135deg,#0f172a,#1e293b,#312e81);
+ color:#e5e7eb;min-height:100vh;padding:20px
+}
+.container{max-width:1050px;margin:auto}
+header{
+ background:rgba(255,255,255,.08);backdrop-filter:blur(10px);
+ border:1px solid rgba(255,255,255,.15);border-radius:20px;
+ padding:28px;margin-bottom:18px
+}
+h1{margin:0 0 8px;font-size:30px}
+.subtitle{color:#cbd5e1}
+.badges span{
+ display:inline-block;padding:7px 12px;border-radius:20px;
+ background:#312e81;margin:10px 6px 0 0;font-size:12px
+}
+.card{
+ background:rgba(15,23,42,.78);border:1px solid rgba(255,255,255,.12);
+ border-radius:18px;padding:22px;margin:16px 0
+}
+h2{margin-top:0;color:#c4b5fd}
+.input-row{display:flex;gap:10px;flex-wrap:wrap}
+input{
+ flex:1;min-width:220px;padding:14px;border-radius:10px;
+ border:1px solid #64748b;background:#0f172a;color:white;font-size:17px
+}
+button{
+ padding:14px 20px;border:0;border-radius:10px;
+ background:#7c3aed;color:white;font-weight:bold;cursor:pointer
+}
+button:hover{background:#6d28d9}
+.secondary{background:#334155}
+.error{color:#fca5a5;margin-top:12px}
+.success{color:#86efac}
+.output{
+ font-size:27px;letter-spacing:5px;font-weight:bold;
+ color:#c4b5fd;word-break:break-all
+}
+.machine{
+ display:flex;justify-content:center;align-items:center;gap:25px;
+ flex-wrap:wrap;margin:20px 0
+}
+.state{
+ width:130px;height:130px;border-radius:50%;display:flex;
+ align-items:center;justify-content:center;text-align:center;
+ border:4px solid #8b5cf6;background:#1e1b4b;font-weight:bold
+}
+.arrow{font-size:24px;color:#a78bfa}
+table{width:100%;border-collapse:collapse;margin-top:14px}
+th,td{border:1px solid #475569;padding:10px;text-align:center}
+th{background:#312e81}
+tr:nth-child(even){background:rgba(255,255,255,.03)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#334155;padding:8px 12px;border-radius:8px;cursor:pointer}
+.chip:hover{background:#475569}
+.steps{overflow-x:auto}
+.small{font-size:13px;color:#94a3b8}
+.footer{text-align:center;color:#94a3b8;padding:15px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+<h1>Binary Two's Complementer</h1>
+<div class="subtitle">Interactive Mealy Machine Simulator • Right-to-Left Binary Processing</div>
+<div class="badges">
+<span>FSM / Mealy Machine</span><span>Automata Theory</span><span>Input Validation</span><span>Step-by-Step Simulation</span>
+</div>
+</header>
+
+<div class="card">
+<h2>1. Binary Input Simulator</h2>
+<p>Enter a binary stream containing only 0 and 1.</p>
+<div class="input-row">
+<input id="bin" placeholder="Example: 101100" maxlength="200">
+<button onclick="process()">Process Binary</button>
+<button class="secondary" onclick="resetApp()">Reset</button>
+</div>
+<div class="chips">
+<span class="chip" onclick="sample('1010')">1010</span>
+<span class="chip" onclick="sample('1101')">1101</span>
+<span class="chip" onclick="sample('100100')">100100</span>
+<span class="chip" onclick="sample('0000')">0000</span>
+<span class="chip" onclick="sample('10201')">Invalid: 10201</span>
+</div>
+<div id="message"></div>
+</div>
+
+<div class="card">
+<h2>2. Mealy Machine Model</h2>
+<p class="small">The machine scans the input from RIGHT to LEFT. Before the first 1 is found, bits are copied. After the first 1, remaining bits are complemented.</p>
+<div class="machine">
+<div class="state">q0<br><span class="small">First 1 not found</span></div>
+<div class="arrow">0 / 0 →</div>
+<div class="state">q0</div>
+<div class="arrow">1 / 1 →</div>
+<div class="state">q1<br><span class="small">First 1 found</span></div>
+</div>
+<div class="machine">
+<div class="state">q1</div>
+<div class="arrow">0 / 1 →</div>
+<div class="state">q1</div>
+<div class="arrow">1 / 0 →</div>
+<div class="state">q1</div>
+</div>
+<p><b>Notation:</b> input / output</p>
+</div>
+
+<div class="card">
+<h2>3. Transition Table</h2>
+<table>
+<tr><th>Current State</th><th>Input</th><th>Output</th><th>Next State</th><th>Meaning</th></tr>
+<tr><td>q0</td><td>0</td><td>0</td><td>q0</td><td>Copy zero</td></tr>
+<tr><td>q0</td><td>1</td><td>1</td><td>q1</td><td>Copy first 1</td></tr>
+<tr><td>q1</td><td>0</td><td>1</td><td>q1</td><td>Complement 0 → 1</td></tr>
+<tr><td>q1</td><td>1</td><td>0</td><td>q1</td><td>Complement 1 → 0</td></tr>
+</table>
+</div>
+
+<div class="card" id="resultCard" style="display:none">
+<h2>4. Simulation Result</h2>
+<p>Input:</p><div id="inputOut" class="output"></div>
+<p>2's Complement:</p><div id="outputOut" class="output"></div>
+<p id="direction" class="success"></p>
+</div>
+
+<div class="card" id="stepsCard" style="display:none">
+<h2>5. Step-by-Step Processing</h2>
+<div class="steps">
+<table id="stepsTable">
+<tr><th>Step</th><th>Position</th><th>Read Bit</th><th>State Before</th><th>Output Bit</th><th>State After</th></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>6. Valid & Invalid Test Cases</h2>
+<table>
+<tr><th>Input</th><th>Type</th><th>Expected Behaviour</th></tr>
+<tr><td>1010</td><td>Valid</td><td>Output 0110</td></tr>
+<tr><td>1101</td><td>Valid</td><td>Output 0011</td></tr>
+<tr><td>100100</td><td>Valid</td><td>Output 011100</td></tr>
+<tr><td>0000</td><td>Valid</td><td>Output 0000</td></tr>
+<tr><td>10201</td><td>Invalid</td><td>Reject input</td></tr>
+<tr><td>10A1</td><td>Invalid</td><td>Reject input</td></tr>
+<tr><td>12.01</td><td>Invalid</td><td>Reject input</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>7. How It Works</h2>
+<ol>
+<li>Check that the input contains only 0 and 1.</li>
+<li>Start scanning from the rightmost bit.</li>
+<li>Copy bits until the first 1 is reached.</li>
+<li>Copy that 1 and move to state q1.</li>
+<li>In q1, complement every remaining bit.</li>
+<li>The resulting stream is the 2's complement.</li>
+</ol>
+</div>
+
+<div class="footer">TAE1 • Project Based Learning • Binary Two's Complementer</div>
+</div>
+
+<script>
+function sample(x){document.getElementById("bin").value=x;process()}
+function process(){
+ const input=document.getElementById("bin").value.trim();
+ const msg=document.getElementById("message");
+ if(!input){msg.innerHTML='<p class="error">Please enter a binary stream.</p>';return}
+ if(!/^[01]+$/.test(input)){
+   msg.innerHTML='<p class="error">❌ Invalid Input: only 0 and 1 are allowed.</p>';
+   document.getElementById("resultCard").style.display="none";
+   document.getElementById("stepsCard").style.display="none";
+   return;
+ }
+ msg.innerHTML='<p class="success">✓ Valid binary input accepted.</p>';
+ let out="",found=false,rows=[];
+ let step=1;
+ for(let i=input.length-1;i>=0;i--){
+   const bit=input[i], before=found?'q1':'q0';
+   let ob;
+   if(!found){ob=bit;if(bit==='1')found=true}
+   else ob=bit==='0'?'1':'0';
+   const after=found?'q1':'q0';
+   out=ob+out;
+   rows.push([step,i+1,bit,before,ob,after]);
+   step++;
+ }
+ document.getElementById("inputOut").textContent=input;
+ document.getElementById("outputOut").textContent=out;
+ document.getElementById("direction").textContent="✓ Processed from RIGHT → LEFT";
+ document.getElementById("resultCard").style.display="block";
+ document.getElementById("stepsCard").style.display="block";
+ const table=document.getElementById("stepsTable");
+ table.innerHTML='<tr><th>Step</th><th>Position</th><th>Read Bit</th><th>State Before</th><th>Output Bit</th><th>State After</th></tr>';
+ rows.forEach(r=>{
+  table.innerHTML+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`;
+ });
+}
+function resetApp(){
+ document.getElementById("bin").value="";
+ document.getElementById("message").innerHTML="";
+ document.getElementById("resultCard").style.display="none";
+ document.getElementById("stepsCard").style.display="none";
+}
+</script>
+</body>
+</html>
